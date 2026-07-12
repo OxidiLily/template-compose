@@ -6,8 +6,8 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - /DATA/media-player/music:/downloads/music
-      - /DATA/media-player/video:/downloads/video
+      - /DATA/Media/music:/downloads/music
+      - /DATA/Media/video:/downloads/video
 
   downtify:
     image: ghcr.io/henriquesebastiao/downtify:latest
@@ -16,8 +16,8 @@ services:
     ports:
       - "8083:8000"
     volumes:
-      - /DATA/media-player/music:/downloads
-      - /DATA/media-player/config/downtify:/data
+      - /DATA/Media/music:/downloads
+      - /DATA/Media/config/downtify:/data
 
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -26,23 +26,19 @@ services:
     ports:
       - "8084:8096"
     volumes:
-      - /DATA/media-player/config/jellyfin:/config
-      - /DATA/media-player/music:/library/music
-      - /DATA/media-player/video:/library/video
-
-  feishin:
-    image: ghcr.io/jeffvli/feishin:latest
-    container_name: feishin
+      - /DATA/Media/config/jellyfin:/config
+      - /DATA/Media/music:/library/music
+      - /DATA/Media/video:/library/video
+      
+  swingmusic:
+    image: ghcr.io/swingmx/swingmusic:latest
+    container_name: swingmusic
     restart: unless-stopped
-    depends_on:
-      - jellyfin
-    environment:
-      - SERVER_NAME=jellyfin
-      - SERVER_LOCK=true
-      - SERVER_TYPE=jellyfin
-      - SERVER_URL=http://100.87.60.23:8084
-      - REMOTE_URL=https://jellyfin.oxidilily.com
-      - LEGACY_AUTHENTICATION=false
-      - ANALYTICS_DISABLED=true
     ports:
-      - "8082:9180"
+      - "8082:1970"
+    volumes:
+      - /DATA/Media/music:/music
+      - /DATA/Media/config/swingmusic:/config
+    environment:
+      - SWINGMUSIC_PORT=1970
+      - SWINGMUSIC_DEVICE_NAME=oxidilily-swingmusic
