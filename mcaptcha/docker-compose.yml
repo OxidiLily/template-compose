@@ -1,0 +1,39 @@
+services:
+  app:
+    build: .
+    container_name: oxidilily
+    restart: unless-stopped
+    ports:
+      - "90:80"
+    volumes:
+      - /DATA/AppData/oxidililyWeb/storage:/var/www/html/storage
+    environment:
+      - TZ=Asia/Jakarta
+      - APP_NAME=${APP_NAME:-Laravel}
+      - APP_ENV=${APP_ENV:-production}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL}
+      - APP_LOCALE=${APP_LOCALE:-en}
+      - APP_FALLBACK_LOCALE=${APP_FALLBACK_LOCALE:-en}
+      - APP_MAINTENANCE_DRIVER=${APP_MAINTENANCE_DRIVER:-file}
+      - BCRYPT_ROUNDS=${BCRYPT_ROUNDS:-12}
+      - LOG_CHANNEL=${LOG_CHANNEL:-stack}
+      - LOG_STACK=${LOG_STACK:-single}
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+      - DB_CONNECTION=${DB_CONNECTION:-pgsql}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_DATABASE=${DB_DATABASE:-oxidilily_web}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SEARCH_PATH=${DB_SEARCH_PATH:-oxidilily}
+      - SESSION_DRIVER=${SESSION_DRIVER:-file}
+      - SESSION_LIFETIME=${SESSION_LIFETIME:-120}
+      - SESSION_SECURE_COOKIE=${SESSION_SECURE_COOKIE:-true}
+      - MCAPTCHA_URL=${MCAPTCHA_URL}
+      - MCAPTCHA_SITE_KEY=${MCAPTCHA_SITE_KEY}
+      - MCAPTCHA_ACCOUNT_SECRET=${MCAPTCHA_ACCOUNT_SECRET}
+      - FILESYSTEM_DISK=${FILESYSTEM_DISK:-local}
+      - QUEUE_CONNECTION=${QUEUE_CONNECTION:-sync}
+      - CACHE_STORE=${CACHE_STORE:-file}
