@@ -1,39 +1,53 @@
+# mCaptcha — deploy terpisah di server yang sama
+# Pakai Supabase PostgreSQL schema mcaptcha
+#
+# Usage:
+#   1. Copy .env.mcaptcha.example → .env.mcaptcha, isi secrets
+#   2. docker compose -f docker-compose-mcaptcha.yml --env-file .env.mcaptcha up -d
+#   3. Buka http://localhost:7000, register admin, buat site key
+#   4. Copy site_key + account_secret ke .env app OxidiLily
+
 services:
-  app:
-    build: .
-    container_name: oxidilily
+  mcaptcha:
+    image: mcaptcha/mcaptcha:latest
+    container_name: mcaptcha
     restart: unless-stopped
     ports:
-      - "90:80"
-    volumes:
-      - /DATA/AppData/oxidililyWeb/storage:/var/www/html/storage
+      - "7000:7000"
     environment:
-      - TZ=Asia/Jakarta
-      - APP_NAME=${APP_NAME:-Laravel}
-      - APP_ENV=${APP_ENV:-production}
-      - APP_KEY=${APP_KEY}
-      - APP_DEBUG=${APP_DEBUG:-false}
-      - APP_URL=${APP_URL}
-      - APP_LOCALE=${APP_LOCALE:-en}
-      - APP_FALLBACK_LOCALE=${APP_FALLBACK_LOCALE:-en}
-      - APP_MAINTENANCE_DRIVER=${APP_MAINTENANCE_DRIVER:-file}
-      - BCRYPT_ROUNDS=${BCRYPT_ROUNDS:-12}
-      - LOG_CHANNEL=${LOG_CHANNEL:-stack}
-      - LOG_STACK=${LOG_STACK:-single}
-      - LOG_LEVEL=${LOG_LEVEL:-debug}
-      - DB_CONNECTION=${DB_CONNECTION:-pgsql}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_DATABASE=${DB_DATABASE:-oxidilily_web}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_SEARCH_PATH=${DB_SEARCH_PATH:-oxidilily}
-      - SESSION_DRIVER=${SESSION_DRIVER:-file}
-      - SESSION_LIFETIME=${SESSION_LIFETIME:-120}
-      - SESSION_SECURE_COOKIE=${SESSION_SECURE_COOKIE:-true}
-      - MCAPTCHA_URL=${MCAPTCHA_URL}
-      - MCAPTCHA_SITE_KEY=${MCAPTCHA_SITE_KEY}
-      - MCAPTCHA_ACCOUNT_SECRET=${MCAPTCHA_ACCOUNT_SECRET}
-      - FILESYSTEM_DISK=${FILESYSTEM_DISK:-local}
-      - QUEUE_CONNECTION=${QUEUE_CONNECTION:-sync}
-      - CACHE_STORE=${CACHE_STORE:-file}
+      - MCAPTCHA_debug=false
+      - MCAPTCHA_commercial=false
+      - MCAPTCHA_source_code=https://github.com/mCaptcha/mCaptcha
+      - MCAPTCHA_allow_registration=true
+      - MCAPTCHA_allow_demo=false
+      # Database — Supabase PG, schema mcaptcha
+      - DATABASE_URL=postgres://${MCAPTCHA_DB_USER:-postgres.asdf}:${MCAPTCHA_DB_PASSWORD}@${MCAPTCHA_DB_HOST:-192.168.2.77}:${MCAPTCHA_DB_PORT:-5432}/${MCAPTCHA_DB_NAME:-oxidilily_web}?options=-c%20search_path%3Dmcaptcha
+      - MCAPTCHA_database_POOL=4
+      # Redis (mcaptcha custom cache)
+      - MCAPTCHA_redis_URL=redis://mcaptcha_redis
+      - MCAPTCHA_redis_POOL=4
+      # Server
+      - PORT=7000
+      - MCAPTCHA_server_DOMAIN=${MCAPTCHA_DOMAIN:-localhost}
+      - MCAPTCHA__server_COOKIE_SECRET=${MCAPTCHA_COOKIE_SECRET}
+      - MCAPTCHA__server_IP=0.0.0.0
+      # Captcha
+      - MCAPTCHA_captcha_SALT=${MCAPTCHA_CAPTCHA_SALT}
+      - MCAPTCHA_captcha_GC=30
+      - MCAPTCHA_captcha_RUNNERS=4
+      - MCAPTCHA_captcha_QUEUE_LENGTH=2000
+      - MCAPTCHA_captcha_ENABLE_STATS=true
+      - MCAPTCHA_captcha_DEFAULT_DIFFICULTY_STRATEGY_avg_traffic_difficulty=50000
+      - MCAPTCHA_captcha_DEFAULT_DIFFICULTY_STRATEGY_peak_sustainable_traffic_difficulty=3000000
+      - MCAPTCHA_captcha_DEFAULT_DIFFICULTY_STRATEGY_broke_my_site_traffic_difficulty=5000000
+      - MCAPTCHA_captcha_DEFAULT_DIFFICULTY_STRATEGY_duration=30
+      - MCAPTCHA_captcha_DEFAULT_DIFFICULTY_STRATEGY_avg_traffic_time=1
+      - MCAPTCHA_captcha_DEFAULT_DIFFICULTY_STRATEGY_peak_sustainable_traffic_time=3
+      - MCAPTCHA_captcha_DEFAULT_DIFFICULTY_STRATEGY_broke_my_site_traffic_time=5
+    depends_on:
+      - mcaptcha_redis
+
+  mcaptcha_redis:
+    image: mcaptcha/cache:latest
+    container_name: mcaptcha_redis
+    restart: unless-stopped

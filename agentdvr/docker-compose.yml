@@ -14,13 +14,10 @@ services:
       - AGENTDVR_WEBUI_PORT=8090
       - AGENTDVR_IP_RANGE=100.64.0.0/10
     volumes:
-      - /media/video/cctv/agentdvr-config:/AgentDVR/Media/XML/
-      - /media/video/cctv/agentdvr-commands:/AgentDVR/Commands/
-      - /media/video/cctv/agentdvr-media:/AgentDVR/Media/WebServerRoot/Media/   # ← ke folder Jellyfin
+      - /DATA/AppData/agentdvr-config:/AgentDVR/Media/XML/
+      - /DATA/AppData/agentdvr-commands:/AgentDVR/Commands/
+      - /DATA/Media/Video/cctv/agentdvr-media:/AgentDVR/Media/WebServerRoot/Media/   # ← ke folder Jellyfin
 
 volumes:
   agentdvr-config: {}
   agentdvr-commands: {}
-
-
-curl -v http://oxidilily:Agung1000@192.168.4.25:8899/onvif/device_service

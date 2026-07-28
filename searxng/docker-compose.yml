@@ -12,8 +12,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - searxng-config:/etc/searxng
-      - searxng-data:/var/cache/searxng
+      - /DATA/AppData/searxng-config:/etc/searxng
+      - /DATA/AppData/searxng-data:/var/cache/searxng
 
 volumes:
   valkey-data: {}

@@ -1,0 +1,18 @@
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    restart: unless-stopped
+    hostname: syncthing-core   # biar gampang dikenali di antar device Syncthing
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    volumes:
+      - /DATA/AppData/syncthing/config:/config
+      - /DATA/AppData/syncthing/data:/var/syncthing/Sync
+    ports:
+      - "8384:8384"   # web UI, akses via NPM/tunnel saja
+      - "22000:22000/tcp"        # sync data, WAJIB publik/port-forward
+      - "22000:22000/udp"        # QUIC transport
+      - "21027:21027/udp"        # local discovery broadcast

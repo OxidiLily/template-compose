@@ -22,5 +22,5 @@ services:
       DISABLE_IPV6: 'true'
 
     volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
+      - /DATA/AppData/nginx-proxy-manager/data:/data
+      - /DATA/AppData/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
