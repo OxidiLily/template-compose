@@ -11,6 +11,8 @@ services:
     volumes:
       - /DATA/AppData/syncthing/config:/config
       - /DATA/AppData/syncthing/data:/var/syncthing/Sync
+      - /DATA/Documents:/DATA/Documents
+      - /DATA/Media:/DATA/Media
     ports:
       - "8384:8384"   # web UI, akses via NPM/tunnel saja
       - "22000:22000/tcp"        # sync data, WAJIB publik/port-forward
