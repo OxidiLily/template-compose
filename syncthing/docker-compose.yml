@@ -7,7 +7,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=${TZ}
+      - TZ=Asia/Jakarta
     volumes:
       - /DATA/AppData/syncthing/config:/config
       - /DATA/AppData/syncthing/data:/var/syncthing/Sync
