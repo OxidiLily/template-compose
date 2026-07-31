@@ -1,38 +1,26 @@
 services:
-  postgres:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      start_period: 30s
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   n8n:
     image: n8nio/n8n:latest
     restart: unless-stopped
     ports:
       - "5678:5678"
     environment:
-      # Configuration PostgreSQL
+      # Konfigurasi PostgreSQL — pakai Supabase yang sudah ada
       - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgres
-      - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
-      - DB_POSTGRESDB_USER=${POSTGRES_USER}
-      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
-      
-      # SÉCURITÉ - Encryption (IMPORTANT)
+      - DB_POSTGRESDB_HOST=${SUPABASE_DB_HOST}      # Tailscale IP CT101, mis. 100.x.x.x
+      - DB_POSTGRESDB_PORT=5432                      # direct connection, bukan pooler
+      - DB_POSTGRESDB_DATABASE=postgres               # Supabase selalu pakai db "postgres"
+      - DB_POSTGRESDB_USER=postgres.asdf
+      - DB_POSTGRESDB_PASSWORD=${N8N_DB_PASSWORD}
+      - DB_POSTGRESDB_SCHEMA=n8n                       # <-- ini kuncinya, isolasi schema
+
+      # SSL (biasanya tidak perlu kalau lewat Tailscale internal)
+      - DB_POSTGRESDB_SSL_ENABLED=false
+
+      # Encryption
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
-      
-      # Configuration réseau
+
+      # Network config
       - N8N_HOST=${N8N_HOST}
       - N8N_PORT=${N8N_PORT}
       - N8N_PROTOCOL=https
@@ -40,22 +28,16 @@ services:
       - WEBHOOK_URL=https://${N8N_HOST}/
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
       - N8N_SECURE_COOKIE=false
-      
     volumes:
       - n8n_data:/home/node/.n8n
-    depends_on:
-      postgres:
-        condition: service_healthy
 
 volumes:
   n8n_data:
-  postgres_data:
-==============================
+==========
 env
-N8N_HOST=n8n.oxidilily.com
+N8N_HOST=
 N8N_PORT=5678
 GENERIC_TIMEZONE=Asia/Jakarta
-POSTGRES_USER=myoxidililykyah
-POSTGRES_PASSWORD=ehumpqwxfz9cp6vqkj5uzuop
-POSTGRES_DB=n8n
-N8N_ENCRYPTION_KEY=3YjogQ5jNUhYRub/KAGLaGfeD6yiRTAmGOdYhnoIbpEvTX027+TZIWcfnvAW04oPYWTyXEsYXLonLxfbsLba2g==
+SUPABASE_DB_HOST=
+N8N_DB_PASSWORD=
+N8N_ENCRYPTION_KEY=
